@@ -17,13 +17,12 @@ export default function BeforeAfterSlider({
   beforeLabel = "Antes",
   afterLabel = "Depois",
 }: BeforeAfterSliderProps) {
-  const [position, setPosition] = useState(100); // Start showing only "before"
+  const [position, setPosition] = useState(100);
   const [isDragging, setIsDragging] = useState(false);
   const [isRevealed, setIsRevealed] = useState(false);
   const [showSlider, setShowSlider] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // After reveal animation completes, animate slider to 50%
   useEffect(() => {
     if (isRevealed) {
       const timer = setTimeout(() => {
@@ -34,16 +33,13 @@ export default function BeforeAfterSlider({
     }
   }, [isRevealed]);
 
-  const updatePosition = useCallback(
-    (clientX: number) => {
-      if (!containerRef.current) return;
-      const rect = containerRef.current.getBoundingClientRect();
-      const x = clientX - rect.left;
-      const percentage = Math.max(0, Math.min(100, (x / rect.width) * 100));
-      setPosition(percentage);
-    },
-    []
-  );
+  const updatePosition = useCallback((clientX: number) => {
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const x = clientX - rect.left;
+    const percentage = Math.max(0, Math.min(100, (x / rect.width) * 100));
+    setPosition(percentage);
+  }, []);
 
   const handlePointerDown = useCallback(
     (e: React.PointerEvent) => {
@@ -67,13 +63,36 @@ export default function BeforeAfterSlider({
     setIsDragging(false);
   }, []);
 
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (!showSlider) return;
+      const step = e.shiftKey ? 10 : 2;
+      if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        setPosition((prev) => Math.max(0, prev - step));
+      } else if (e.key === "ArrowRight") {
+        e.preventDefault();
+        setPosition((prev) => Math.min(100, prev + step));
+      }
+    },
+    [showSlider]
+  );
+
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-full overflow-hidden select-none touch-none"
+      className="relative w-full h-full overflow-hidden select-none touch-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 focus-visible:ring-offset-stone-950 rounded-2xl"
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
+      onPointerLeave={handlePointerUp}
+      onKeyDown={handleKeyDown}
+      tabIndex={0}
+      role="slider"
+      aria-label="Comparar antes e depois do redesign"
+      aria-valuenow={Math.round(position)}
+      aria-valuemin={0}
+      aria-valuemax={100}
     >
       {/* After image (redesigned) - full background */}
       <div className="absolute inset-0">
@@ -105,16 +124,13 @@ export default function BeforeAfterSlider({
       <AnimatePresence>
         {showSlider && (
           <motion.div
-            className="absolute top-0 bottom-0 z-10"
+            className="absolute top-0 bottom-0 z-10 pointer-events-none"
             style={{ left: `${position}%` }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5 }}
           >
-            {/* Vertical line */}
             <div className="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-0.5 bg-gradient-to-b from-amber-500 to-orange-500 shadow-[0_0_8px_rgba(245,158,11,0.4)]" />
-
-            {/* Grip handle */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 rounded-full glass border border-amber-500/30 flex items-center justify-center cursor-grab active:cursor-grabbing shadow-lg">
               <div className="flex gap-0.5">
                 <div className="w-0.5 h-4 bg-amber-500/60 rounded-full" />
@@ -130,7 +146,7 @@ export default function BeforeAfterSlider({
         {showSlider && (
           <>
             <motion.div
-              className="absolute top-3 left-3 z-10"
+              className="absolute top-3 left-3 z-10 pointer-events-none"
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.2 }}
@@ -140,7 +156,7 @@ export default function BeforeAfterSlider({
               </span>
             </motion.div>
             <motion.div
-              className="absolute top-3 right-3 z-10"
+              className="absolute top-3 right-3 z-10 pointer-events-none"
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.3 }}

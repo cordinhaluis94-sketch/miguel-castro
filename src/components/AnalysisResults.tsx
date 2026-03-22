@@ -45,36 +45,47 @@ export default function AnalysisResults({
           </p>
         </motion.div>
 
-        {/* Score + Room overview */}
-        <motion.div
-          {...fadeUp}
-          transition={{ duration: 0.6, delay: 0.1 }}
-          className="grid md:grid-cols-3 gap-6 mb-12"
-        >
-          {/* Photo - Before/After comparison */}
-          <div className={`${result.generatedImageUrl ? "md:col-span-2" : "md:col-span-1"} rounded-2xl overflow-hidden border border-stone-800 aspect-video`}>
-            {result.generatedImageUrl ? (
+        {/* Before/After comparison - full width */}
+        {result.generatedImageUrl && (
+          <motion.div
+            {...fadeUp}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="mb-8"
+          >
+            <div className="rounded-2xl overflow-hidden border border-stone-800 aspect-video max-h-[500px]">
               <BeforeAfterSlider
                 beforeImage={imageUrl}
                 afterImage={result.generatedImageUrl}
               />
-            ) : (
-              /* eslint-disable-next-line @next/next/no-img-element */
+            </div>
+          </motion.div>
+        )}
+
+        {/* Score + Room overview */}
+        <motion.div
+          {...fadeUp}
+          transition={{ duration: 0.6, delay: result.generatedImageUrl ? 0.2 : 0.1 }}
+          className="grid md:grid-cols-3 gap-6 mb-12"
+        >
+          {/* Photo (only when no generated image) */}
+          {!result.generatedImageUrl && (
+            <div className="md:col-span-1 rounded-2xl overflow-hidden border border-stone-800 aspect-video">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={imageUrl}
                 alt="Divisão analisada"
                 className="w-full h-full object-cover"
               />
-            )}
-          </div>
+            </div>
+          )}
 
           {/* Score Card */}
           <div className="glass rounded-2xl p-8 flex flex-col items-center justify-center">
             <p className="text-xs uppercase tracking-[0.2em] text-stone-500 mb-4">
               Pontuação de Design
             </p>
-            <div className="relative w-40 h-40 mb-4">
-              <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
+            <div className="relative w-40 h-40 mb-4" role="img" aria-label={`Pontuação de design: ${result.overallScore} de 100`}>
+              <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100" aria-hidden="true">
                 <circle
                   cx="50" cy="50" r="42"
                   fill="none" stroke="#292524" strokeWidth="6"
@@ -111,7 +122,7 @@ export default function AnalysisResults({
           </div>
 
           {/* Room Info */}
-          <div className="glass rounded-2xl p-8">
+          <div className={`glass rounded-2xl p-8 ${result.generatedImageUrl ? "md:col-span-2" : ""}`}>
             <p className="text-xs uppercase tracking-[0.2em] text-stone-500 mb-6">
               Detalhes da Divisão
             </p>

@@ -1,9 +1,18 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { Sparkles } from "lucide-react";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Sparkles, Menu, X } from "lucide-react";
+
+const navLinks = [
+  { href: "#upload", label: "Analisar" },
+  { href: "#how-it-works", label: "Como Funciona" },
+  { href: "#styles", label: "Estilos" },
+];
 
 export default function Header() {
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
     <motion.header
       initial={{ y: -20, opacity: 0 }}
@@ -25,27 +34,56 @@ export default function Header() {
             </p>
           </div>
         </div>
+
+        {/* Desktop nav */}
         <nav className="hidden md:flex items-center gap-8">
-          <a
-            href="#upload"
-            className="text-sm text-stone-400 hover:text-stone-200 transition-colors"
-          >
-            Analisar
-          </a>
-          <a
-            href="#how-it-works"
-            className="text-sm text-stone-400 hover:text-stone-200 transition-colors"
-          >
-            Como Funciona
-          </a>
-          <a
-            href="#styles"
-            className="text-sm text-stone-400 hover:text-stone-200 transition-colors"
-          >
-            Estilos
-          </a>
+          {navLinks.map((link) => (
+            <a
+              key={link.href}
+              href={link.href}
+              className="text-sm text-stone-400 hover:text-stone-200 transition-colors focus-visible:outline-none focus-visible:text-amber-400"
+            >
+              {link.label}
+            </a>
+          ))}
         </nav>
+
+        {/* Mobile menu button */}
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="md:hidden p-2 rounded-lg text-stone-400 hover:text-stone-200 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
+          aria-label={isOpen ? "Fechar menu" : "Abrir menu"}
+          aria-expanded={isOpen}
+        >
+          {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+        </button>
       </div>
+
+      {/* Mobile nav */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.nav
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="md:hidden overflow-hidden border-t border-stone-800/50"
+          >
+            <div className="px-6 py-4 flex flex-col gap-4">
+              {navLinks.map((link) => (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setIsOpen(false)}
+                  className="text-sm text-stone-400 hover:text-stone-200 transition-colors py-1 focus-visible:outline-none focus-visible:text-amber-400"
+                >
+                  {link.label}
+                </a>
+              ))}
+            </div>
+          </motion.nav>
+        )}
+      </AnimatePresence>
     </motion.header>
   );
 }

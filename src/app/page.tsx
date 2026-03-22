@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
@@ -16,18 +16,28 @@ export default function Home() {
     null
   );
   const [imageUrl, setImageUrl] = useState<string>("");
+  const scrollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const handleAnalysisComplete = (result: AnalysisResult, imgUrl: string) => {
-    setAnalysisResult(result);
-    setImageUrl(imgUrl);
+  // Cleanup scroll timer on unmount
+  useEffect(() => {
+    return () => {
+      if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
+    };
+  }, []);
 
-    // Scroll to results
-    setTimeout(() => {
-      document
-        .getElementById("results")
-        ?.scrollIntoView({ behavior: "smooth" });
-    }, 100);
-  };
+  const handleAnalysisComplete = useCallback(
+    (result: AnalysisResult, imgUrl: string) => {
+      setAnalysisResult(result);
+      setImageUrl(imgUrl);
+
+      scrollTimerRef.current = setTimeout(() => {
+        document
+          .getElementById("results")
+          ?.scrollIntoView({ behavior: "smooth" });
+      }, 100);
+    },
+    []
+  );
 
   return (
     <main className="min-h-screen">

@@ -5,6 +5,19 @@ export const metadata: Metadata = {
   title: "InteriorAI — Design de Interiores por Foto",
   description:
     "Transforme qualquer divisão com sugestões profissionais de design de interiores geradas por inteligência artificial.",
+  openGraph: {
+    title: "InteriorAI — Design de Interiores por Foto",
+    description:
+      "Carregue uma foto, escolha o estilo e veja o espaço reimaginado em segundos.",
+    type: "website",
+    locale: "pt_PT",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "InteriorAI — Design de Interiores por Foto",
+    description:
+      "Carregue uma foto, escolha o estilo e veja o espaço reimaginado em segundos.",
+  },
 };
 
 export default function RootLayout({

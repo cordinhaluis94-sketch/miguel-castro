@@ -391,8 +391,10 @@ export function analyzeRoom(selectedStyleId?: string): AnalysisResult {
         description: selected.description,
         icon: selected.icon,
       };
+      const normalize = (str: string) =>
+        str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
       const others = shuffleAndPick(
-        DESIGN_STYLES.filter((s) => !s.name.toLowerCase().includes(selected.name.toLowerCase())),
+        DESIGN_STYLES.filter((s) => !normalize(s.name).includes(normalize(selected.name))),
         2
       );
       styles = [mainStyle, ...others];
