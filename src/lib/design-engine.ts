@@ -51,6 +51,66 @@ const ROOM_TYPES = [
   { type: "Sala de Jantar", icon: "🍽️" },
 ];
 
+export interface SelectableStyle {
+  id: string;
+  name: string;
+  gradient: string;
+  tags: string[];
+  icon: string;
+  description: string;
+}
+
+export const SELECTABLE_STYLES: SelectableStyle[] = [
+  {
+    id: "minimalista",
+    name: "Minimalista",
+    gradient: "linear-gradient(135deg, #f5f5f0 0%, #e8e4e1 50%, #d6d3ce 100%)",
+    tags: ["Clean", "Funcional", "Sereno"],
+    icon: "◻️",
+    description: "Linhas limpas, espaços abertos e uma paleta neutra que transmite serenidade e sofisticação.",
+  },
+  {
+    id: "escandinavo",
+    name: "Escandinavo",
+    gradient: "linear-gradient(135deg, #e8dcc8 0%, #c9b99a 50%, #a69a7b 100%)",
+    tags: ["Hygge", "Natural", "Luminoso"],
+    icon: "🌿",
+    description: "Funcionalidade nórdica com materiais naturais, tons claros e design orgânico.",
+  },
+  {
+    id: "industrial",
+    name: "Industrial",
+    gradient: "linear-gradient(135deg, #44403c 0%, #78716c 50%, #a8a29e 100%)",
+    tags: ["Urbano", "Raw", "Autêntico"],
+    icon: "⚙️",
+    description: "Elementos brutos como tijolo exposto, metal e madeira reciclada num ambiente urbano.",
+  },
+  {
+    id: "japandi",
+    name: "Japandi",
+    gradient: "linear-gradient(135deg, #d4c5a9 0%, #b8a88a 50%, #8c7e68 100%)",
+    tags: ["Zen", "Harmonia", "Wabi-sabi"],
+    icon: "🎋",
+    description: "Fusão harmoniosa entre o minimalismo japonês e o acolhimento escandinavo.",
+  },
+  {
+    id: "art-deco",
+    name: "Art Déco",
+    gradient: "linear-gradient(135deg, #1a1a2e 0%, #c9a96e 50%, #e8d9c0 100%)",
+    tags: ["Glamour", "Geométrico", "Bold"],
+    icon: "✨",
+    description: "Glamour geométrico com detalhes dourados, veludo e padrões ousados.",
+  },
+  {
+    id: "boho",
+    name: "Boho",
+    gradient: "linear-gradient(135deg, #c2703e 0%, #d4a574 50%, #e8d5c4 100%)",
+    tags: ["Eclético", "Texturas", "Vibrante"],
+    icon: "🌺",
+    description: "Texturas ricas, padrões étnicos e uma vibe descontraída e acolhedora.",
+  },
+];
+
 const DESIGN_STYLES: DesignStyle[] = [
   {
     name: "Minimalista Contemporâneo",
@@ -318,9 +378,30 @@ function shuffleAndPick<T>(arr: T[], count: number): T[] {
   return shuffled.slice(0, count);
 }
 
-export function analyzeRoom(): AnalysisResult {
+export function analyzeRoom(selectedStyleId?: string): AnalysisResult {
   const room = ROOM_TYPES[Math.floor(Math.random() * ROOM_TYPES.length)];
-  const styles = shuffleAndPick(DESIGN_STYLES, 3);
+
+  let styles: DesignStyle[];
+  if (selectedStyleId) {
+    const selected = SELECTABLE_STYLES.find((s) => s.id === selectedStyleId);
+    if (selected) {
+      const mainStyle: DesignStyle = {
+        name: selected.name,
+        confidence: 0.95,
+        description: selected.description,
+        icon: selected.icon,
+      };
+      const others = shuffleAndPick(
+        DESIGN_STYLES.filter((s) => !s.name.toLowerCase().includes(selected.name.toLowerCase())),
+        2
+      );
+      styles = [mainStyle, ...others];
+    } else {
+      styles = shuffleAndPick(DESIGN_STYLES, 3);
+    }
+  } else {
+    styles = shuffleAndPick(DESIGN_STYLES, 3);
+  }
   const palettes = shuffleAndPick(COLOR_PALETTES, 3);
   const furniture = shuffleAndPick(FURNITURE_CATALOG, 4);
   const lighting = shuffleAndPick(LIGHTING_TIPS, 3);

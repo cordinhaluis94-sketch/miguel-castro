@@ -26,9 +26,9 @@ export default function Hero() {
             <span className="text-stone-400">o Seu Espaço</span>
           </h1>
           <p className="text-lg md:text-xl text-stone-400 max-w-2xl mx-auto mb-12 leading-relaxed">
-            Carregue uma foto de qualquer divisão e receba sugestões
-            profissionais de design — estilos, paletas de cores, mobiliário e
-            iluminação, tudo gerado por IA.
+            Carregue uma foto, escolha o estilo e veja o espaço reimaginado em
+            segundos — paletas de cores, mobiliário e iluminação, tudo gerado
+            por IA.
           </p>
         </motion.div>
 
@@ -39,9 +39,9 @@ export default function Hero() {
           className="flex flex-wrap justify-center gap-8 mb-16"
         >
           {[
-            { icon: Camera, label: "Fotografe", desc: "Tire uma foto" },
-            { icon: Palette, label: "Analise", desc: "IA processa" },
-            { icon: Lightbulb, label: "Transforme", desc: "Receba sugestões" },
+            { icon: Camera, label: "Fotografe", desc: "Carregue a foto" },
+            { icon: Palette, label: "Escolha", desc: "Selecione o estilo" },
+            { icon: Lightbulb, label: "Transforme", desc: "Veja o resultado" },
           ].map((item, i) => (
             <div key={i} className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-xl bg-stone-800/50 border border-stone-700/50 flex items-center justify-center">

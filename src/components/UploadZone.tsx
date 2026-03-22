@@ -8,8 +8,9 @@ import {
   X,
   Loader2,
   Sparkles,
+  Check,
 } from "lucide-react";
-import { analyzeRoom, AnalysisResult } from "@/lib/design-engine";
+import { analyzeRoom, AnalysisResult, SELECTABLE_STYLES } from "@/lib/design-engine";
 
 interface UploadZoneProps {
   onAnalysisComplete: (result: AnalysisResult, imageUrl: string) => void;
@@ -20,6 +21,7 @@ export default function UploadZone({ onAnalysisComplete }: UploadZoneProps) {
   const [preview, setPreview] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [selectedStyle, setSelectedStyle] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFile = useCallback((file: File) => {
@@ -42,7 +44,7 @@ export default function UploadZone({ onAnalysisComplete }: UploadZoneProps) {
   );
 
   const handleAnalyze = useCallback(() => {
-    if (!preview) return;
+    if (!preview || !selectedStyle) return;
     setIsAnalyzing(true);
     setProgress(0);
 
@@ -50,7 +52,7 @@ export default function UploadZone({ onAnalysisComplete }: UploadZoneProps) {
       "Detetando divisão...",
       "Analisando composição...",
       "Avaliando paleta de cores...",
-      "Identificando estilo...",
+      `Aplicando estilo ${SELECTABLE_STYLES.find((s) => s.id === selectedStyle)?.name}...`,
       "Gerando novo design...",
       "Aplicando transformações...",
       "Compilando relatório...",
@@ -62,18 +64,19 @@ export default function UploadZone({ onAnalysisComplete }: UploadZoneProps) {
       setProgress((step / steps.length) * 100);
       if (step >= steps.length) {
         clearInterval(interval);
-        const result = analyzeRoom();
+        const result = analyzeRoom(selectedStyle);
         setTimeout(() => {
           setIsAnalyzing(false);
           onAnalysisComplete(result, preview);
         }, 500);
       }
     }, 600);
-  }, [preview, onAnalysisComplete]);
+  }, [preview, selectedStyle, onAnalysisComplete]);
 
   const clearPreview = () => {
     setPreview(null);
     setProgress(0);
+    setSelectedStyle(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
@@ -202,11 +205,49 @@ export default function UploadZone({ onAnalysisComplete }: UploadZoneProps) {
                   )}
                 </div>
 
-                <div className="p-6 bg-stone-900/80 flex items-center justify-between">
+                {/* Style Selector */}
+                {!isAnalyzing && (
+                  <div className="p-6 bg-stone-900/60 border-t border-stone-800">
+                    <p className="text-xs uppercase tracking-[0.2em] text-stone-500 mb-4">
+                      Escolha o estilo pretendido
+                    </p>
+                    <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
+                      {SELECTABLE_STYLES.map((style) => (
+                        <button
+                          key={style.id}
+                          onClick={() => setSelectedStyle(style.id)}
+                          className={`relative group/style rounded-xl overflow-hidden aspect-[4/3] border-2 transition-all duration-200 ${
+                            selectedStyle === style.id
+                              ? "border-amber-500 shadow-[0_0_12px_rgba(245,158,11,0.3)]"
+                              : "border-stone-700/50 hover:border-stone-500"
+                          }`}
+                        >
+                          <div
+                            className="absolute inset-0 transition-transform duration-500 group-hover/style:scale-110"
+                            style={{ background: style.gradient }}
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-stone-950/80 to-transparent" />
+                          {selectedStyle === style.id && (
+                            <div className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-amber-500 flex items-center justify-center">
+                              <Check className="w-3 h-3 text-stone-950" />
+                            </div>
+                          )}
+                          <div className="absolute bottom-0 left-0 right-0 p-2">
+                            <p className="text-xs font-medium text-white/90">{style.name}</p>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <div className="p-6 bg-stone-900/80 flex items-center justify-between border-t border-stone-800">
                   <div className="flex items-center gap-3">
                     <ImageIcon className="w-5 h-5 text-stone-400" />
                     <span className="text-sm text-stone-300">
-                      Foto carregada com sucesso
+                      {selectedStyle
+                        ? `Estilo: ${SELECTABLE_STYLES.find((s) => s.id === selectedStyle)?.name}`
+                        : "Foto carregada — escolha um estilo"}
                     </span>
                   </div>
                   <div className="flex items-center gap-3">
@@ -220,13 +261,17 @@ export default function UploadZone({ onAnalysisComplete }: UploadZoneProps) {
                     </button>
                     <button
                       onClick={handleAnalyze}
-                      disabled={isAnalyzing}
+                      disabled={isAnalyzing || !selectedStyle}
                       className="px-6 py-2.5 rounded-lg text-sm font-medium bg-gradient-to-r
                         from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500
-                        text-white transition-all disabled:opacity-50 flex items-center gap-2"
+                        text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                     >
                       <Sparkles className="w-4 h-4" />
-                      <span>Analisar Design</span>
+                      <span>
+                        {selectedStyle
+                          ? `Reimaginar em ${SELECTABLE_STYLES.find((s) => s.id === selectedStyle)?.name}`
+                          : "Selecione um estilo"}
+                      </span>
                     </button>
                   </div>
                 </div>
