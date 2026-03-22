@@ -11,6 +11,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { AnalysisResult } from "@/lib/design-engine";
+import BeforeAfterSlider from "./BeforeAfterSlider";
 
 interface AnalysisResultsProps {
   result: AnalysisResult;
@@ -50,14 +51,21 @@ export default function AnalysisResults({
           transition={{ duration: 0.6, delay: 0.1 }}
           className="grid md:grid-cols-3 gap-6 mb-12"
         >
-          {/* Photo */}
-          <div className="md:col-span-1 rounded-2xl overflow-hidden border border-stone-800">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={imageUrl}
-              alt="Divisão analisada"
-              className="w-full h-full object-cover"
-            />
+          {/* Photo - Before/After comparison */}
+          <div className={`${result.generatedImageUrl ? "md:col-span-2" : "md:col-span-1"} rounded-2xl overflow-hidden border border-stone-800 aspect-video`}>
+            {result.generatedImageUrl ? (
+              <BeforeAfterSlider
+                beforeImage={imageUrl}
+                afterImage={result.generatedImageUrl}
+              />
+            ) : (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img
+                src={imageUrl}
+                alt="Divisão analisada"
+                className="w-full h-full object-cover"
+              />
+            )}
           </div>
 
           {/* Score Card */}

@@ -51,7 +51,8 @@ export default function UploadZone({ onAnalysisComplete }: UploadZoneProps) {
       "Analisando composição...",
       "Avaliando paleta de cores...",
       "Identificando estilo...",
-      "Gerando sugestões...",
+      "Gerando novo design...",
+      "Aplicando transformações...",
       "Compilando relatório...",
     ];
 

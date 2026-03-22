@@ -39,6 +39,7 @@ export interface AnalysisResult {
   overallScore: number;
   improvements: string[];
   moodKeywords: string[];
+  generatedImageUrl: string;
 }
 
 const ROOM_TYPES = [
@@ -278,6 +279,40 @@ const IMPROVEMENTS = [
   "Pendurar arte à altura dos olhos (centro a 157cm do chão).",
 ];
 
+// Imagens de interiores redesenhados por tipo de divisão
+const REDESIGN_IMAGES: Record<string, string[]> = {
+  "Sala de Estar": [
+    "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=800&q=80",
+    "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=800&q=80",
+    "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&q=80",
+  ],
+  "Quarto": [
+    "https://images.unsplash.com/photo-1616594039964-ae9021a400a0?w=800&q=80",
+    "https://images.unsplash.com/photo-1617325247661-675ab4b64ae2?w=800&q=80",
+    "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80",
+  ],
+  "Cozinha": [
+    "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&q=80",
+    "https://images.unsplash.com/photo-1600489000022-c2086d79f9d4?w=800&q=80",
+    "https://images.unsplash.com/photo-1556909172-54557c7e4fb7?w=800&q=80",
+  ],
+  "Casa de Banho": [
+    "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=800&q=80",
+    "https://images.unsplash.com/photo-1600573472592-401b489a3cdc?w=800&q=80",
+    "https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=800&q=80",
+  ],
+  "Escritório": [
+    "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&q=80",
+    "https://images.unsplash.com/photo-1593062096033-9a26b09da705?w=800&q=80",
+    "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80",
+  ],
+  "Sala de Jantar": [
+    "https://images.unsplash.com/photo-1617806118233-18e1de247200?w=800&q=80",
+    "https://images.unsplash.com/photo-1600210491892-03d54c0aaf87?w=800&q=80",
+    "https://images.unsplash.com/photo-1595514535415-dae8580c416c?w=800&q=80",
+  ],
+};
+
 function shuffleAndPick<T>(arr: T[], count: number): T[] {
   const shuffled = [...arr].sort(() => Math.random() - 0.5);
   return shuffled.slice(0, count);
@@ -292,6 +327,10 @@ export function analyzeRoom(): AnalysisResult {
   const improvements = shuffleAndPick(IMPROVEMENTS, 5);
   const mood = shuffleAndPick(MOOD_KEYWORDS, 5);
 
+  // Selecionar imagem de redesign baseada no tipo de divisão
+  const roomImages = REDESIGN_IMAGES[room.type] || REDESIGN_IMAGES["Sala de Estar"];
+  const generatedImageUrl = roomImages[Math.floor(Math.random() * roomImages.length)];
+
   return {
     roomType: room.type,
     roomTypeIcon: room.icon,
@@ -303,5 +342,6 @@ export function analyzeRoom(): AnalysisResult {
     overallScore: Math.floor(Math.random() * 25) + 65,
     improvements,
     moodKeywords: mood,
+    generatedImageUrl,
   };
 }
